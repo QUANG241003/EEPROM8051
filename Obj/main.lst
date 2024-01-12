@@ -1,0 +1,230 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              12/12/2023 15:00:35 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Obj\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE User\main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\App\24c02;.\App\iic;.\App\
+                    -key;.\App\smg;.\Public) DEBUG OBJECTEXTEND PRINT(.\Obj\main.lst) OBJECT(.\Obj\main.obj)
+
+line level    source
+
+   1          #include "public.h"
+   2          #include "24c02.h"
+   3          #include "key.h"
+   4          #include "smg.h"
+   5          #include "lcd.h"
+   6          #include <stdio.h>
+   7          
+   8          #define EEPROM_ADDRESS  0       
+   9          #define GPIO_KEY P1
+  10          
+  11          unsigned char KeyValue;
+  12          unsigned char KeyState;
+  13          unsigned char check;
+  14          unsigned char check1;
+  15          void Delay10ms();
+  16          void KeyDown();
+  17          
+  18          void main() {
+  19   1          unsigned char key_temp = 0;
+  20   1           char input[6];
+  21   1           char chuoi1[6];
+  22   1          unsigned char status = 0;
+  23   1          unsigned char i, j;
+  24   1              unsigned b=0;
+  25   1              int stt=0;
+  26   1          lcd1602_init();
+  27   1              at24c02_write_one_byte(EEPROM_ADDRESS    ,2);
+  28   1              at24c02_write_one_byte(EEPROM_ADDRESS + 1,2);
+  29   1              at24c02_write_one_byte(EEPROM_ADDRESS + 2,2);
+  30   1              at24c02_write_one_byte(EEPROM_ADDRESS + 3,2);
+  31   1              at24c02_write_one_byte(EEPROM_ADDRESS + 4,2);
+  32   1              at24c02_write_one_byte(EEPROM_ADDRESS + 5,2);
+  33   1          lcd1602_show_string(0, 0, "Enter password");
+  34   1      
+  35   1          while (1) {
+  36   2              check = 0;
+  37   2              KeyDown();
+  38   2      
+  39   2              if (KeyState) {
+  40   3                  unsigned char a = KeyValue + '0';   
+  41   3                  status++;
+  42   3                  if (status == 1) {
+  43   4                      lcd1602_clear();
+  44   4                  }
+  45   3                  delay_ms(100);
+  46   3                  input[j] = KeyValue;
+  47   3                  KeyState = 0;
+  48   3                  lcd1602_write_cmd(0x80 + 0x40);
+  49   3                  lcd1602_show_integer(j, 0, a - '0');
+  50   3                  j++;
+  51   3              }
+  52   2      
+  53   2              key_temp = key_scan(0);
+  54   2      
+C51 COMPILER V9.60.0.0   MAIN                                                              12/12/2023 15:00:35 PAGE 2   
+
+  55   2              if (key_temp == KEY1_PRESS) {
+  56   3                  j--;
+  57   3                  lcd1602_clear_position(j, 0);
+  58   3              }
+  59   2      
+  60   2              if (key_temp == KEY2_PRESS) {   
+  61   3                  check = 0;
+  62   3                              lcd1602_clear();
+  63   3                  for (i = 0; i < 30; i++) {
+  64   4                      chuoi1[i % 6] = at24c02_read_one_byte(EEPROM_ADDRESS + i);
+  65   4                      if (chuoi1[i % 6] == input[i % 6]) {
+  66   5                          check++;
+  67   5                          if (check == 6) {
+  68   6                              lcd1602_show_string(0, 0, "Correct");
+  69   6                                                                                              check1 =6;
+  70   6                              while (check1 == 6 && key_temp != KEY1_PRESS) {
+  71   7                                                                                                              KeyDown();
+  72   7                                                                                                                      if (KeyState) {
+  73   8                                                                                                                                      unsigned char a = KeyValue + '0';       
+  74   8                                                                                                                                      status++;
+  75   8                                                                                                                                      if (status == 1) {
+  76   9                                                                                                                                                      lcd1602_clear();
+  77   9                                                                                                                                      }
+  78   8                                                                                                                                      delay_ms(100);
+  79   8                                                                                                                                      input[j] = KeyValue;
+  80   8                                                                                                                                      KeyState = 0;
+  81   8                                                                                                                                      lcd1602_write_cmd(0x80 + 0x40);
+  82   8                                                                                                                                      lcd1602_show_integer(j, 0, a - '0');
+  83   8                                                                                                                                      j++;
+  84   8                                                                                                                      }
+  85   7                                  key_temp = key_scan(0);
+  86   7                                  if (key_temp == KEY1_PRESS) {
+  87   8                                                                              lcd1602_show_string(0, 0, "Back and enter");
+  88   8                                                                              lcd1602_show_string(0, 1, "Password");
+  89   8                                                                              check=0;
+  90   8                                                                              check1 = 34234;
+  91   8                                                                              j=0;
+  92   8                                                                              delay_ms(2000);
+  93   8                                                                              lcd1602_clear();                
+  94   8                                  }
+  95   7                                                              if (key_temp == KEY2_PRESS) { 
+  96   8                                                                      
+  97   8                                                                  lcd1602_show_string(0, 0, "Add new password");
+  98   8                                                                      lcd1602_show_integer(1, 1, stt);                                                                                                                        
+  99   8                                                                      delay_ms(2000);
+ 100   8                                                                      lcd1602_clear();
+ 101   8                                                                      j = 0;
+ 102   8                                                              }
+ 103   7                                                              if (key_temp == KEY3_PRESS) {
+ 104   8                                                                       for (j = 0; j < 29; j++) {
+ 105   9                                                  at24c02_write_one_byte(EEPROM_ADDRESS + j, 0xff);
+ 106   9                                           }
+ 107   8                                                                              lcd1602_clear();
+ 108   8                                                                              j = 0;
+ 109   8                                                                              stt=0;
+ 110   8                                                                              lcd1602_show_string(0, 0, "Delete all");        
+ 111   8                                                                              delay_ms(1000);
+ 112   8                                                                              lcd1602_clear();
+ 113   8                                                              
+ 114   8                                                                                                                      }
+ 115   7                                  if (key_temp == KEY4_PRESS) {
+ 116   8                                                                      stt++;
+C51 COMPILER V9.60.0.0   MAIN                                                              12/12/2023 15:00:35 PAGE 3   
+
+ 117   8                                                                      if (stt>=5)
+ 118   8                                                                      stt=5;
+ 119   8                                      i = 6;
+ 120   8                                      while (i < 30) {
+ 121   9                                          unsigned char kt = at24c02_read_one_byte(EEPROM_ADDRESS + i);
+ 122   9                                          lcd1602_show_string(0, 0, "Checking EEPROM");                                               
+ 123   9                                          lcd1602_show_integer(0, 1, stt);
+ 124   9                                          lcd1602_show_integer(5, 1, kt);
+ 125   9                                          delay_ms(500);
+ 126   9                                          if (kt == 0xFF) {
+ 127  10                                              for (j = 0; j < 6; j++) {
+ 128  11                                                  at24c02_write_one_byte(EEPROM_ADDRESS + i + j, input[j]);
+ 129  11                                              }
+ 130  10                                              break;
+ 131  10                                          } else {
+ 132  10                                              i += 6;
+ 133  10                                          }
+ 134   9                                      }
+ 135   8                                      if (i >= 30) {
+ 136   9                                          lcd1602_clear();
+ 137   9                                          lcd1602_show_string(0, 0, "Full memory");
+ 138   9                                      }
+ 139   8                                      delay_ms(1000);
+ 140   8                                                                      j=0;
+ 141   8                                                                      lcd1602_clear();        
+ 142   8                                  }
+ 143   7                              }
+ 144   6                          }
+ 145   5                      }
+ 146   4                  }
+ 147   3                  if(check != 6 && key_temp != KEY1_PRESS) {
+ 148   4                      lcd1602_show_string(0, 0, "Incorrect");
+ 149   4                                      j=0;
+ 150   4                  }
+ 151   3              }
+ 152   2              if (key_temp == KEY3_PRESS) {
+ 153   3                      /*      for (i = 0; i < 30; i++) {
+ 154   3                      chuoi1[i % 6] = at24c02_read_one_byte(EEPROM_ADDRESS + i);
+ 155   3                                lcd1602_show_integer(0, 0, chuoi1[i % 6] );
+ 156   3                              }*/
+ 157   3                              delay_ms(4000);
+ 158   3                  lcd1602_clear();
+ 159   3                  j = 0;
+ 160   3              }
+ 161   2          }
+ 162   1      }
+ 163          void KeyDown(void) {
+ 164   1          char a;
+ 165   1          GPIO_KEY = 0x0f;
+ 166   1          if (GPIO_KEY != 0x0f) {
+ 167   2              Delay10ms();
+ 168   2              if (GPIO_KEY != 0x0f) {
+ 169   3                  KeyState = 1;
+ 170   3                  GPIO_KEY = 0X0F;
+ 171   3                  switch (GPIO_KEY) {
+ 172   4                      case(0X07): KeyValue = 0; break;
+ 173   4                      case(0X0b): KeyValue = 1; break;
+ 174   4                      case(0X0d): KeyValue = 2; break;
+ 175   4                      case(0X0e): KeyValue = 3; break;
+ 176   4                  }
+ 177   3                  GPIO_KEY = 0XF0;
+ 178   3                  Delay10ms();
+C51 COMPILER V9.60.0.0   MAIN                                                              12/12/2023 15:00:35 PAGE 4   
+
+ 179   3                  switch (GPIO_KEY) {
+ 180   4                      case(0X70): KeyValue = KeyValue; break;
+ 181   4                      case(0Xb0): KeyValue = KeyValue + 4; break;
+ 182   4                      case(0Xd0): KeyValue = KeyValue + 8; break;
+ 183   4                      case(0Xe0): KeyValue = KeyValue + 12; break;
+ 184   4                  }
+ 185   3                  while ((a < 50) && (GPIO_KEY != 0xf0)) {
+ 186   4                      Delay10ms();
+ 187   4                      a++;
+ 188   4                  }
+ 189   3                  a = 0;
+ 190   3              }
+ 191   2          }
+ 192   1              
+ 193   1      }
+ 194          void Delay10ms(void) {
+ 195   1          unsigned char a, b, c;
+ 196   1      
+ 197   1          for (c = 1; c > 0; c--)
+ 198   1              for (b = 38; b > 0; b--)
+ 199   1                  for (a = 130; a > 0; a--);
+ 200   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    914    ----
+   CONSTANT SIZE    =    113    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4      22
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
